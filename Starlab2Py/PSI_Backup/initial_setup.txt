@@ -1,0 +1,5 @@
+﻿Starlab2: setup inicial - 2025-11-04T14:53:16
+Usuario: Camilo C
+Equipo : DESKTOP-IILTRHG
+Python : C:\Users\Camilo C\Documents\starlab2\.venv\Scripts\python.exe
+Puerto : 8000

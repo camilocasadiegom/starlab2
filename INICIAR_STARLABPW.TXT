@@ -1,0 +1,321 @@
+@echo off
+chcp 65001 >nul 2>&1
+title 🚀 STARLABPW - Sistema Automático
+color 0A
+cls
+
+echo.
+echo ═══════════════════════════════════════════════════════════
+echo    🚀 STARLABPW v3.0 - Iniciando Sistema Automático
+echo ═══════════════════════════════════════════════════════════
+echo.
+
+cd /d "%~dp0"
+
+REM Verificar Python
+python --version >nul 2>&1
+if %errorlevel% neq 0 (
+    echo  ❌ ERROR: Python no está instalado
+    echo.
+    echo  Descarga Python desde: https://www.python.org/downloads/
+    pause
+    exit /b 1
+)
+
+echo  [1/8] Validando Python... OK
+timeout /t 1 >nul
+
+REM Crear estructura de directorios
+echo  [2/8] Creando estructura de archivos...
+if not exist "starlabpw_data" mkdir starlabpw_data
+if not exist "starlabpw_data\logs" mkdir starlabpw_data\logs
+echo       OK
+timeout /t 1 >nul
+
+REM Limpiar procesos anteriores
+echo  [3/8] Limpiando procesos anteriores...
+taskkill /F /IM cloudflared.exe >nul 2>&1
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :8000 ^| findstr LISTENING') do taskkill /F /PID %%a >nul 2>&1
+echo       OK
+timeout /t 1 >nul
+
+REM Crear entorno virtual
+echo  [4/8] Configurando entorno virtual Python...
+if not exist ".venv" (
+    python -m venv .venv
+)
+call .venv\Scripts\activate.bat
+echo       OK
+timeout /t 1 >nul
+
+REM Instalar dependencias
+echo  [5/8] Instalando dependencias (esto puede tomar un momento)...
+python -m pip install --upgrade pip --quiet
+pip install fastapi uvicorn[standard] --quiet
+echo       OK
+timeout /t 1 >nul
+
+REM Crear registro.html
+echo  [6/8] Generando archivos del sistema...
+if not exist "registro.html" (
+    (
+    echo ^<!DOCTYPE html^>
+    echo ^<html lang="es"^>
+    echo ^<head^>
+    echo     ^<meta charset="UTF-8"^>
+    echo     ^<meta name="viewport" content="width=device-width, initial-scale=1.0"^>
+    echo     ^<title^>Starlab - Registro de Conductores^</title^>
+    echo     ^<style^>
+    echo         * { box-sizing: border-box; margin: 0; padding: 0; }
+    echo         body {
+    echo             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    echo             background: linear-gradient^(135deg, #667eea 0%%, #764ba2 100%%^);
+    echo             min-height: 100vh;
+    echo             display: flex;
+    echo             align-items: center;
+    echo             justify-content: center;
+    echo             padding: 20px;
+    echo         }
+    echo         .container {
+    echo             background: white;
+    echo             border-radius: 20px;
+    echo             box-shadow: 0 20px 60px rgba^(0,0,0,0.3^);
+    echo             max-width: 500px;
+    echo             width: 100%%;
+    echo             overflow: hidden;
+    echo         }
+    echo         .header {
+    echo             background: linear-gradient^(135deg, #667eea 0%%, #764ba2 100%%^);
+    echo             color: white;
+    echo             padding: 30px;
+    echo             text-align: center;
+    echo         }
+    echo         .header h1 { font-size: 28px; margin-bottom: 5px; }
+    echo         .header p { opacity: 0.9; font-size: 14px; }
+    echo         .content { padding: 40px 30px; }
+    echo         .form-group { margin-bottom: 25px; }
+    echo         label {
+    echo             display: block;
+    echo             margin-bottom: 8px;
+    echo             font-weight: 600;
+    echo             color: #333;
+    echo             font-size: 14px;
+    echo         }
+    echo         input {
+    echo             width: 100%%;
+    echo             padding: 14px;
+    echo             border: 2px solid #e0e0e0;
+    echo             border-radius: 10px;
+    echo             font-size: 15px;
+    echo             transition: all 0.3s;
+    echo         }
+    echo         input:focus {
+    echo             outline: none;
+    echo             border-color: #667eea;
+    echo             box-shadow: 0 0 0 3px rgba^(102, 126, 234, 0.1^);
+    echo         }
+    echo         button {
+    echo             width: 100%%;
+    echo             padding: 16px;
+    echo             background: linear-gradient^(135deg, #667eea 0%%, #764ba2 100%%^);
+    echo             color: white;
+    echo             border: none;
+    echo             border-radius: 10px;
+    echo             font-size: 16px;
+    echo             font-weight: 700;
+    echo             cursor: pointer;
+    echo             transition: transform 0.2s, box-shadow 0.2s;
+    echo         }
+    echo         button:hover {
+    echo             transform: translateY^(-2px^);
+    echo             box-shadow: 0 10px 25px rgba^(102, 126, 234, 0.3^);
+    echo         }
+    echo     ^</style^>
+    echo ^</head^>
+    echo ^<body^>
+    echo     ^<div class="container"^>
+    echo         ^<div class="header"^>
+    echo             ^<h1^>🚗 Starlab^</h1^>
+    echo             ^<p^>Sistema de Registro de Conductores^</p^>
+    echo         ^</div^>
+    echo         ^<div class="content"^>
+    echo             ^<form action="/registrar" method="post"^>
+    echo                 ^<div class="form-group"^>
+    echo                     ^<label for="nombre"^>Nombre completo^</label^>
+    echo                     ^<input type="text" id="nombre" name="nombre" placeholder="Ej: Juan Pérez" required minlength="2" maxlength="100"^>
+    echo                 ^</div^>
+    echo                 ^<div class="form-group"^>
+    echo                     ^<label for="licencia"^>Número de Licencia^</label^>
+    echo                     ^<input type="text" id="licencia" name="licencia" placeholder="Ej: L12345678" required minlength="5" maxlength="20"^>
+    echo                 ^</div^>
+    echo                 ^<div class="form-group"^>
+    echo                     ^<label for="vehiculo"^>Vehículo^</label^>
+    echo                     ^<input type="text" id="vehiculo" name="vehiculo" placeholder="Ej: Toyota Corolla 2020" required minlength="2" maxlength="50"^>
+    echo                 ^</div^>
+    echo                 ^<button type="submit"^>Registrar Conductor^</button^>
+    echo             ^</form^>
+    echo         ^</div^>
+    echo     ^</div^>
+    echo ^</body^>
+    echo ^</html^>
+    ) > registro.html
+)
+
+REM Crear aplicación FastAPI
+(
+echo import os
+echo import json
+echo from datetime import datetime
+echo from pathlib import Path
+echo from fastapi import FastAPI, Request, HTTPException
+echo from fastapi.responses import HTMLResponse, JSONResponse
+echo from fastapi.middleware.cors import CORSMiddleware
+echo.
+echo REGISTRO_PATH = r"%~dp0registro.html"
+echo DATA_DIR = Path^(r"%~dp0starlabpw_data"^)
+echo DATA_DIR.mkdir^(parents=True, exist_ok=True^)
+echo REGISTROS_FILE = DATA_DIR / "registros.json"
+echo.
+echo app = FastAPI^(title="Starlab", version="3.0"^)
+echo app.add_middleware^(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"]^)
+echo.
+echo def load_registros^(^):
+echo     if REGISTROS_FILE.exists^(^):
+echo         try:
+echo             with open^(REGISTROS_FILE, "r", encoding="utf-8"^) as f:
+echo                 return json.load^(f^)
+echo         except:
+echo             return []
+echo     return []
+echo.
+echo def save_registro^(data^):
+echo     registros = load_registros^(^)
+echo     data["timestamp"] = datetime.now^(^).isoformat^(^)
+echo     data["id"] = len^(registros^) + 1
+echo     registros.append^(data^)
+echo     with open^(REGISTROS_FILE, "w", encoding="utf-8"^) as f:
+echo         json.dump^(registros, f, indent=2, ensure_ascii=False^)
+echo     return data
+echo.
+echo @app.get^("/health"^)
+echo def health^(^):
+echo     return {"status": "ok", "timestamp": datetime.now^(^).isoformat^(^)}
+echo.
+echo @app.get^("/", response_class=HTMLResponse^)
+echo def home^(^):
+echo     if not os.path.isfile^(REGISTRO_PATH^):
+echo         return HTMLResponse^("Error: No se encontró registro.html", status_code=404^)
+echo     with open^(REGISTRO_PATH, "r", encoding="utf-8"^) as f:
+echo         return HTMLResponse^(f.read^(^)^)
+echo.
+echo @app.post^("/registrar", response_class=HTMLResponse^)
+echo async def registrar^(request: Request^):
+echo     form = await request.form^(^)
+echo     nombre = ^(form.get^("nombre"^) or ""^).strip^(^)
+echo     licencia = ^(form.get^("licencia"^) or ""^).strip^(^)
+echo     vehiculo = ^(form.get^("vehiculo"^) or ""^).strip^(^)
+echo     if not all^([nombre, licencia, vehiculo]^):
+echo         return HTMLResponse^(f"Error: Datos incompletos. ^<a href='/'">Volver^</a^>", status_code=400^)
+echo     data = {"nombre": nombre, "licencia": licencia, "vehiculo": vehiculo}
+echo     saved = save_registro^(data^)
+echo     return HTMLResponse^(f"""^<html^>^<head^>^<meta charset='UTF-8'^>^<style^>body{{font-family:Arial;padding:40px;background:linear-gradient^(135deg,#11998e,#38ef7d^);color:white;text-align:center}}h2{{margin-bottom:20px}}.info{{background:rgba^(255,255,255,0.2^);padding:20px;border-radius:10px;margin:20px auto;max-width:400px}}a{{color:white;text-decoration:none;background:rgba^(0,0,0,0.3^);padding:10px 20px;border-radius:5px;display:inline-block;margin-top:20px}}^</style^>^</head^>^<body^>^<h2^>✅ Registro Exitoso^</h2^>^<div class='info'^>^<p^>^<strong^>Nombre:^</strong^> {nombre}^</p^>^<p^>^<strong^>Licencia:^</strong^> {licencia}^</p^>^<p^>^<strong^>Vehículo:^</strong^> {vehiculo}^</p^>^<p style='font-size:12px;margin-top:10px'^>ID: #{saved['id']}^</p^>^</div^>^<a href='/'">← Registrar otro^</a^>^</body^>^</html^>"""^)
+echo.
+echo @app.get^("/api/registros"^)
+echo def api_get_registros^(^):
+echo     return JSONResponse^({"ok": True, "registros": load_registros^(^)}^)
+) > starlab_autoserve.py
+
+echo       OK
+timeout /t 1 >nul
+
+REM Iniciar servidor
+echo  [7/8] Iniciando servidor web en puerto 8000...
+start /B .venv\Scripts\python.exe -m uvicorn starlab_autoserve:app --host 0.0.0.0 --port 8000 > starlabpw_data\logs\uvicorn.log 2>&1
+timeout /t 3 >nul
+echo       OK
+
+REM Descargar cloudflared si no existe
+if not exist "cloudflared.exe" (
+    echo       Descargando Cloudflared...
+    powershell -Command "Invoke-WebRequest -Uri 'https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-windows-amd64.exe' -OutFile 'cloudflared.exe'"
+    echo       OK
+)
+
+REM Iniciar túnel Cloudflare
+echo  [8/8] Creando túnel público con Cloudflare...
+start /B cloudflared.exe tunnel --url http://localhost:8000 > starlabpw_data\logs\cloudflared.log 2>&1
+
+echo       Esperando URL pública...
+timeout /t 2 >nul
+
+REM Esperar URL pública
+set "PUBLIC_URL="
+set "ATTEMPTS=0"
+
+:WAIT_URL
+if %ATTEMPTS% GEQ 60 goto URL_TIMEOUT
+set /a ATTEMPTS+=1
+
+findstr /C:"https://" starlabpw_data\logs\cloudflared.log > nul 2>&1
+if %errorlevel% EQU 0 (
+    for /f "tokens=*" %%i in ('findstr /C:"https://.*trycloudflare.com" starlabpw_data\logs\cloudflared.log') do (
+        set "LINE=%%i"
+        goto EXTRACT_URL
+    )
+)
+
+timeout /t 1 >nul
+goto WAIT_URL
+
+:EXTRACT_URL
+REM Extraer URL usando PowerShell
+for /f "delims=" %%a in ('powershell -Command "Get-Content starlabpw_data\logs\cloudflared.log | Select-String -Pattern 'https://[a-z0-9-]+\.trycloudflare\.com' | ForEach-Object { $_.Matches.Value } | Select-Object -First 1"') do set "PUBLIC_URL=%%a"
+
+if defined PUBLIC_URL (
+    echo       OK
+    goto SHOW_RESULTS
+)
+goto WAIT_URL
+
+:URL_TIMEOUT
+echo       ADVERTENCIA: No se pudo obtener URL pública
+echo       Pero el servidor LOCAL funciona en: http://localhost:8000
+start http://localhost:8000
+goto END_SCRIPT
+
+:SHOW_RESULTS
+REM Guardar URL
+echo %PUBLIC_URL% > starlabpw_data\public_url.txt
+
+cls
+echo.
+echo ═══════════════════════════════════════════════════════════
+echo           ✅ SISTEMA INICIADO CORRECTAMENTE
+echo ═══════════════════════════════════════════════════════════
+echo.
+echo  🌐 URL PÚBLICA (Cloudflare):
+echo     %PUBLIC_URL%
+echo.
+echo  💻 URL LOCAL:
+echo     http://localhost:8000
+echo.
+echo  📊 Estado: Servidor activo y túnel establecido
+echo  📁 Registros: starlabpw_data\registros.json
+echo.
+echo ═══════════════════════════════════════════════════════════
+echo.
+echo  ℹ️  El sistema está corriendo en segundo plano
+echo  ℹ️  Puedes cerrar esta ventana de forma segura
+echo  ℹ️  La URL pública es temporal y válida por esta sesión
+echo.
+
+REM Abrir URL en navegador
+start %PUBLIC_URL%
+
+REM Crear ventana de notificación con PowerShell
+powershell -Command "Add-Type -AssemblyName System.Windows.Forms; Add-Type -AssemblyName System.Drawing; $form = New-Object System.Windows.Forms.Form; $form.Text = '✅ STARLABPW - URL Pública Lista'; $form.Size = New-Object System.Drawing.Size(600, 350); $form.StartPosition = 'CenterScreen'; $form.FormBorderStyle = 'FixedDialog'; $form.MaximizeBox = $false; $form.BackColor = [System.Drawing.Color]::FromArgb(240, 248, 255); $form.TopMost = $true; $lblIcon = New-Object System.Windows.Forms.Label; $lblIcon.Text = '✅'; $lblIcon.Font = New-Object System.Drawing.Font('Segoe UI', 48); $lblIcon.AutoSize = $true; $lblIcon.Location = New-Object System.Drawing.Point(250, 20); $form.Controls.Add($lblIcon); $lblTitle = New-Object System.Windows.Forms.Label; $lblTitle.Text = 'Sistema STARLABPW Activo'; $lblTitle.Font = New-Object System.Drawing.Font('Segoe UI', 16, [System.Drawing.FontStyle]::Bold); $lblTitle.ForeColor = [System.Drawing.Color]::FromArgb(102, 126, 234); $lblTitle.AutoSize = $true; $lblTitle.Location = New-Object System.Drawing.Point(150, 100); $form.Controls.Add($lblTitle); $lblURL = New-Object System.Windows.Forms.Label; $lblURL.Text = '🌐 URL PÚBLICA:'; $lblURL.Font = New-Object System.Drawing.Font('Segoe UI', 10, [System.Drawing.FontStyle]::Bold); $lblURL.AutoSize = $true; $lblURL.Location = New-Object System.Drawing.Point(20, 150); $form.Controls.Add($lblURL); $txtURL = New-Object System.Windows.Forms.TextBox; $txtURL.Text = '%PUBLIC_URL%'; $txtURL.Size = New-Object System.Drawing.Size(560, 30); $txtURL.Location = New-Object System.Drawing.Point(20, 180); $txtURL.ReadOnly = $true; $txtURL.Font = New-Object System.Drawing.Font('Consolas', 9); $form.Controls.Add($txtURL); $btnCopy = New-Object System.Windows.Forms.Button; $btnCopy.Text = '📋 Copiar URL'; $btnCopy.Size = New-Object System.Drawing.Size(120, 35); $btnCopy.Location = New-Object System.Drawing.Point(20, 220); $btnCopy.BackColor = [System.Drawing.Color]::FromArgb(102, 126, 234); $btnCopy.ForeColor = [System.Drawing.Color]::White; $btnCopy.FlatStyle = 'Flat'; $btnCopy.Add_Click({[System.Windows.Forms.Clipboard]::SetText('%PUBLIC_URL%'); [System.Windows.Forms.MessageBox]::Show('✅ URL copiada al portapapeles', 'Copiado', 'OK', 'Information')}); $form.Controls.Add($btnCopy); $lblInfo = New-Object System.Windows.Forms.Label; $lblInfo.Text = 'ℹ️  El sistema está activo en segundo plano`nℹ️  La URL es temporal (válida por esta sesión)`nℹ️  Puedes compartir la URL con cualquier persona'; $lblInfo.Size = New-Object System.Drawing.Size(560, 60); $lblInfo.Location = New-Object System.Drawing.Point(20, 265); $lblInfo.Font = New-Object System.Drawing.Font('Segoe UI', 9); $form.Controls.Add($lblInfo); $btnClose = New-Object System.Windows.Forms.Button; $btnClose.Text = 'Entendido ✓'; $btnClose.Size = New-Object System.Drawing.Size(120, 35); $btnClose.Location = New-Object System.Drawing.Point(460, 265); $btnClose.BackColor = [System.Drawing.Color]::FromArgb(76, 175, 80); $btnClose.ForeColor = [System.Drawing.Color]::White; $btnClose.FlatStyle = 'Flat'; $btnClose.Add_Click({$form.Close()}); $form.Controls.Add($btnClose); $form.ShowDialog() | Out-Null"
+
+:END_SCRIPT
+echo  ✅ Presiona cualquier tecla para cerrar esta ventana
+pause >nul
+exit /b 0
