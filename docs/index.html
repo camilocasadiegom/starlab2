@@ -1,112 +1,77 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Starlinx · Panel</title>
-  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body class="theme-dark">
-  <header class="topbar">
-    <div class="brand">
-      <span class="logo">★</span>
-      <div class="brand-text">
-        <strong>Starlinx</strong>
-        <small class="slogan">“Pronto estaré en línea”</small>
-      </div>
+<header class="topbar">
+  <div class="brand"><span class="logo">★</span><strong>Starlinx</strong>
+    <small class="slogan">“Pronto estaré en línea”</small></div>
+  <nav>
+    <a id="repoLink" href="#"
+
+set -eu
+cd /data/data/com.termux/files/home/starlab2
+
+# === 1) Lista de túneles (agrega/ordena a tu gusto) ===
+mkdir -p docs/assets
+cat > docs/assets/urls.json <<'JSON'
+{
+  "tunnels": [
+    "https://TU-URL-TRYCLOUDFLARE-1.example.com",
+    "https://TU-URL-TRYCLOUDFLARE-2.example.com"
+  ]
+}
+JSON
+
+# === 2) Index con área para estado + mockups + embed ===
+cat > docs/index.html <<'HTML'
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Starlinx · Panel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+<header class="topbar">
+  <div class="brand"><span class="logo">★</span><strong>Starlinx</strong>
+    <small class="slogan">“Pronto estaré en línea”</small></div>
+  <nav>
+    <a id="repoLink" href="#" target="_blank" rel="noopener">Repo</a>
+    <span class="sep">|</span>
+    <span>Backend: <strong id="backendStatus">Verificando…</strong></span>
+    <button id="tryAgain" class="btn small">Reintentar</button>
+    <a id="openBackend" class="btn small" href="javascript:void(0)" target="_blank" rel="noopener">Abrir backend</a>
+  </nav>
+</header>
+
+<main class="container">
+  <section class="hero card">
+    <h1>Panel público de Starlinx</h1>
+    <p>Landing de pruebas con rotación de túneles y mockups del formulario.</p>
+
+    <div class="segmented">
+      <button class="seg active" data-theme="cards">Cards</button>
+      <button class="seg" data-theme="dark">Dark</button>
+      <button class="seg" data-theme="steps">Steps</button>
     </div>
-    <nav class="nav">
-      <a href="./">Inicio</a>
-      <a id="repoLink" target="_blank" rel="noopener">Repo</a>
-    </nav>
-  </header>
 
-  <main class="container">
-    <section class="status-card">
-      <h1>Panel público de Starlinx</h1>
-      <p class="muted">Desplegado con GitHub Pages. Integra un backend FastAPI vía túnel seguro.</p>
+    <div id="mock-cards" class="mock visible card mockbox">[Mockup: Cards]</div>
+    <div id="mock-dark"  class="mock card mockbox">[Mockup: Dark]</div>
+    <div id="mock-steps" class="mock card mockbox">[Mockup: Steps]</div>
+  </section>
 
-      <div class="status-row">
-        <span>Backend:</span>
-        <strong id="backendStatus">Verificando…</strong>
-      </div>
+  <section class="card embed">
+    <h2>Documentación (Swagger) del backend</h2>
+    <p class="muted" id="embedHint">Se mostrará automáticamente cuando el backend esté en línea.</p>
+    <iframe id="docsFrame" title="Swagger" loading="lazy" referrerpolicy="no-referrer" style="display:none;"></iframe>
+  </section>
+</main>
 
-      <div class="cta-row">
-        <a id="openBackend" class="btn" target="_blank" rel="noopener">Abrir backend</a>
-        <button id="tryAgain" class="btn ghost" type="button">Reintentar health</button>
-      </div>
-    </section>
-
-    <section class="mockups">
-      <div class="controls">
-        <label>Vista:</label>
-        <div class="segmented">
-          <button data-theme="cards"  class="seg active">Cards</button>
-          <button data-theme="dark"   class="seg">Dark</button>
-          <button data-theme="steps"  class="seg">Steps</button>
-        </div>
-      </div>
-
-      <!-- Mockup: Cards -->
-      <article id="mock-cards" class="mock visible">
-        <h2>Formulario · Cards</h2>
-        <div class="grid">
-          <div class="card">
-            <h3>Datos básicos</h3>
-            <div class="field"><label>Nombre</label><input placeholder="Carlos Pérez" /></div>
-            <div class="field split">
-              <div><label>Documento</label><input placeholder="CC / Pasaporte" /></div>
-              <div><label>Teléfono</label><input placeholder="+57 300 000 0000" /></div>
-            </div>
-          </div>
-          <div class="card">
-            <h3>Vehículo</h3>
-            <div class="field"><label>Placa</label><input placeholder="ABC123" /></div>
-            <div class="field"><label>Tipo</label><select><option>Sedán</option><option>SUV</option><option>Van</option></select></div>
-          </div>
-          <div class="card">
-            <h3>Documentos</h3>
-            <div class="field"><label>Licencia</label><input placeholder="# / vigencia" /></div>
-            <div class="field"><label>SOAT</label><input placeholder="Vigencia" /></div>
-          </div>
-        </div>
-        <div class="actions"><button class="btn">Enviar</button></div>
-      </article>
-
-      <!-- Mockup: Dark (simple) -->
-      <article id="mock-dark" class="mock">
-        <h2>Formulario · Dark</h2>
-        <form class="panel">
-          <div class="field"><label>Nombre</label><input /></div>
-          <div class="field"><label>Email</label><input type="email" /></div>
-          <div class="field"><label>Teléfono</label><input /></div>
-          <div class="field"><label>Vehículo</label><input /></div>
-          <div class="actions"><button class="btn">Registrar</button></div>
-        </form>
-      </article>
-
-      <!-- Mockup: Steps -->
-      <article id="mock-steps" class="mock">
-        <h2>Formulario · Steps</h2>
-        <ol class="steps">
-          <li class="done"><span>1</span> Datos personales</li>
-          <li class="current"><span>2</span> Vehículo</li>
-          <li><span>3</span> Documentos</li>
-          <li><span>4</span> Confirmación</li>
-        </ol>
-        <div class="panel">
-          <div class="field"><label>Placa</label><input /></div>
-          <div class="field"><label>Tipo</label><select><option>Sedán</option><option>SUV</option><option>Van</option></select></div>
-          <div class="actions">
-            <button class="btn ghost">Atrás</button>
-            <button class="btn">Siguiente</button>
-          </div>
-        </div>
-      </article>
-    </section>
-  </main>
-
-  <footer>© 2025 Starlab / Starlinx</footer>
-  <script src="./assets/app.js"></script>
+<footer>© 2025 Starlab / Starlinx</footer>
+<script src="assets/app.js"></script>
 </body>
 </html>

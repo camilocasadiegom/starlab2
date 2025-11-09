@@ -1,0 +1,6 @@
+{
+  "tunnels": [
+    "https://TU-URL-TRYCLOUDFLARE-1.example.com",
+    "https://TU-URL-TRYCLOUDFLARE-2.example.com"
+  ]
+}
