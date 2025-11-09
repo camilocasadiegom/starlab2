@@ -1,1 +1,5 @@
-{"tunnels":["https://completely-approximate-recognition-policies.trycloudflare.com","https://TU-URL-TRYCLOUDFLARE-1.example.com","https://TU-URL-TRYCLOUDFLARE-2.example.com"]}
+{
+  "tunnels": [
+    "https://introduce-sugar-protected-considers.trycloudflare.com"
+  ]
+}
