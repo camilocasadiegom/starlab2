@@ -1,0 +1,11 @@
+:root { --bg:#0f1220; --card:#171a2b; --text:#e7e9f3; --muted:#99a1c2; --brand:#7dd3fc; }
+*{box-sizing:border-box} html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font:16px/1.5 system-ui,Segoe UI,Roboto}
+.topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:#111425;border-bottom:1px solid #1d233b;position:sticky;top:0}
+.brand{display:flex;gap:10px;align-items:center}
+.logo{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,#60a5fa,#7dd3fc);color:#0b1020;font-weight:700}
+.slogan{color:var(--muted);margin-left:6px}
+nav a{color:var(--muted);text-decoration:none;margin-left:14px}
+nav a:hover{color:var(--text)}
+.hero{max-width:900px;margin:60px auto;padding:28px;border:1px solid #1d233b;background:var(--card);border-radius:16px;text-align:center}
+.btn{display:inline-block;padding:10px 16px;border-radius:12px;background:var(--brand);color:#001018;text-decoration:none;font-weight:700}
+footer{color:var(--muted);text-align:center;padding:40px 0}
