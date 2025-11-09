@@ -29,3 +29,6 @@
 .steps li.done span{background:#1c7d4e;border-color:#1c7d4e}
 .steps li.current span{background:#2d3d7a;border-color:#2d3d7a}
 @media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+/* Botón deshabilitado para cuando no hay BACKEND_URL */
+.btn.disabled{pointer-events:none;opacity:.55;filter:grayscale(30%);}
