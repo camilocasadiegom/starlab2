@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>Resumen de {{conductor}}</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;margin:24px;color:#0d1b2a}
+    h1{margin:0 0 8px}
+    h2{margin:24px 0 8px}
+    .meta{color:#3e4a59}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{border:1px solid #ddd;padding:8px;font-size:13px}
+    th{background:#f5f5f5;text-align:left}
+    .total{font-weight:bold}
+  </style>
+</head>
+<body>
+  <h1>Starlinx – Resumen de {{conductor}}</h1>
+  <div class="meta">Generado: {{fecha}}</div>
+
+  <h2>Totales</h2>
+  <table>
+    <tr><th>Viajes</th><td>{{viajes}}</td></tr>
+    <tr><th>Bruto (€)</th><td>{{bruto}}</td></tr>
+    <tr><th>Comisión (€)</th><td>{{comision}}</td></tr>
+    <tr class="total"><th>Neto (€)</th><td>{{neto}}</td></tr>
+  </table>
+
+  <h2>Detalle</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Fecha</th><th>Servicio</th><th>Ruta</th><th>KM</th><th>Bruto</th><th>Comisión</th><th>Neto</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{filas}}
+    </tbody>
+  </table>
+</body>
+</html>

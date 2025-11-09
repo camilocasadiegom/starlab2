@@ -1,0 +1,13 @@
+{
+  "currency": "EUR",
+  "rules": {
+    "airport":    {"type": "flat", "value": 55.0},
+    "hourly":     {"type": "per_hour", "value": 30.0},
+    "long_distance": {"type": "per_km", "value": 1.50},
+    "transfer":   {"type": "flat", "value": 40.0},
+    "other":      {"type": "flat", "value": 0.0}
+  },
+  "commission": {
+    "default_pct": 0.20
+  }
+}
